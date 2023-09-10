@@ -9,26 +9,25 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import useFetch from "./useFetch";
 
 
-const RegisterCustomer = () => {
+const Report = () => {
     const navigate = useNavigate();
     const [ isClicked, setIsClicked] = useState(false);
     const { id } = useParams();
     const [searchQuery, setSearchQuery] = useState('');
-    const { data: customers, isPending,  error } = useFetch('http://localhost:8080/api/customer');
+    const customerID = localStorage.getItem('id');
+    // console.log("customerID =>", customerID);
+    const { data: equipments, isPending,  error } = useFetch(`http://localhost:8080/api/equipment/customerEquipments/${customerID}`);
+    console.log("equipments =>", equipments);
 
-    const handleDelete = (customerID) => {
-        fetch('http://localhost:8080/api/customer/delete/' + customerID, {
-            method: 'DELETE'
-        }).then(() => {
-            navigate("/addCustomer")
-            setIsClicked(true);
-        })
-    }
-
-    const handleReport = (id) => {
-        localStorage.setItem("id",id)
-        navigate("/report")
-    }
+    // const handleDelete = (customerID) => {
+    //     fetch('http://localhost:8080/api/customer/delete/' + customerID, {
+    //         method: 'DELETE'
+    //     }).then(() => {
+    //         navigate("/addCustomer")
+    //         setIsClicked(true);
+    //     })
+    // }
+    
 
     const storedName = localStorage.getItem('name');
     const customerName = storedName ? storedName: "";
@@ -48,10 +47,10 @@ const RegisterCustomer = () => {
     }
 
     const filteredData = searchQuery
-    ? customers.filter((item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ? equipments.filter((item) =>
+        item.productName.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : customers;
+    : equipments;
 
     return ( 
         <div className="bg-customLight h-screen flex">
@@ -81,7 +80,7 @@ const RegisterCustomer = () => {
                     <h1 className="m-7 text-lg block text-customDark font-semibold">{customerName}</h1>
                     <div className="h-20 w-20 bg-customMedium rounded-full"></div>
                 </div>
-                <h1 className="animate-fade-in text-2xl text-customDark font-semibold mb-7">CUSTOMERS</h1>
+                <h1 className="animate-fade-in text-2xl text-customDark font-semibold mb-7">INVOICE</h1>
                 <div className="flex">
                     <button className="text-xs border-2 border-light bg-light text-customDark py-2 w-48 mr-2 rounded-lg shadow-lg">CUSTOMERS</button>
                     <Link to="/addCustomer"><button className="text-xs border-2 border-customMedium bg-customMedium text-customDark py-2 w-48 mr-2 rounded-lg shadow-lg">REGISTER</button></Link>
@@ -103,14 +102,15 @@ const RegisterCustomer = () => {
                 { error && <div>{ error }</div> }
                 { isPending && <div>Loading...</div> }
 
-                { filteredData && filteredData.map((customer) => (
-                    <div key={customer.id}>
+                { filteredData && filteredData.map((equipment) => (
+                    <div key={equipment.id}>
                         <div className="flex justify-evenly gap-2">
-                            <div className="w-32 text-left"><h1 className="mt-9 text-xs text-customDark font-semibold">{ customer.name }</h1></div>
-                            <div className="w-40 text-left"><h1 className="mt-9 text-xs text-customDark font-semibold">{ customer.email }</h1></div>
-                            <div className="w-32 text-left"><h1 className="mt-9 text-xs text-customDark font-semibold">{ customer.phone }</h1></div>
-                            <div className="text-left"><button onClick={() => handleReport(customer.id)} className="mt-7 text-xs border-2 border-customMedium bg-customMedium text-customDark py-2 w-24 rounded-lg shadow-lg">REPORT</button></div>
-                            <div className="text-left"><button onClick={() => handleDelete(customer.id)} className=" mt-7 text-xs border-2 border-customMedium bg-customMedium text-customDark py-2 w-24 rounded-lg shadow-lg">DELETE</button></div>
+                        <div className="w-32 text-left"><h1 className="mt-9 text-xs text-customDark font-semibold">{ equipment.productName }</h1></div>
+                            <div className="w-40 text-left"><h1 className="mt-9 text-xs text-customDark font-semibold">{ equipment.qty }</h1></div>
+                            <div className="w-32 text-left"><h1 className="mt-9 text-xs text-customDark font-semibold">{ equipment.dateCreated.join("/") }</h1></div>
+                            <div className="w-32 text-left"><h1 className="mt-9 text-xs text-customDark font-semibold">{ equipment.customer.name }</h1></div>
+                            {/* <div className="text-left"><button className="mt-7 text-xs border-2 border-customMedium bg-customMedium text-customDark py-2 w-24 rounded-lg shadow-lg">UPDATE</button></div>
+                            <div className="text-left"><button onClick={() => handleDelete(customer.id)} className=" mt-7 text-xs border-2 border-customMedium bg-customMedium text-customDark py-2 w-24 rounded-lg shadow-lg">DELETE</button></div> */}
                         </div>
                         <hr className="border-b border-customMedium mt-9" />
                     </div>
@@ -121,7 +121,7 @@ const RegisterCustomer = () => {
      );
 }
  
-export default RegisterCustomer;
+export default Report;
 
 
 
